@@ -1,0 +1,103 @@
+---
+title: "Team 13: Chicago Crime Analysis in the Project Progress Report Stage"
+format:
+    jss-pdf:
+        keep-tex: true
+    jss-html: default
+author:
+  - name: Yu Wang (yw78)
+    email: yw78@illinois.edu
+    affiliations:
+      - name: UIUC
+        department: Department of Statistics
+  - name: Yijia Hu (yijiahu3)
+    email: yijiahu3@illinois.edu
+    affiliations:
+      - name: UIUC
+        department: Department of Statistics
+abstract: |
+  This project aims to analyze dynamic criminal data in the city of Chicago with explanatory data analysis. Our task was to provide a comprehensive analysis of the crimes that took place in Chicago starting from January 1, 2020. The central idea of the project is constructing a complete and robust pipeline to retrieve dynamic data using API, store, analyze the data, and eventually output some plots and graphs and undiscover insights from the dataset. At this stage, we successfully imported data with a robust framework, and used data visualization tools to identify crime patterns and distributions, including the types of crime, types of location that crime happens, seasonality in crime occurrence and other interesting factors behind the dataset. In addition, we will try to depict crime trends and predict criminal rates and types based on its seasonality. 
+keywords: [R, group project]
+keywords-formatted: [R, group project]
+bibliography: bibliography.bib  
+---
+
+## Introduction
+The City of Chicago has long struggled with high crime rates, and developing effective crime prevention strategies has proven to be a difficult task. This project aims to use data analytics techniques to analyze crime data in Chicago and identify crime patterns.
+
+The project has two main objectives. First, we want to construct a complete and stable pipeline using dynamic data, considering most up-to-date paper or websites using historical data that lack of timeliness. Secondly, we will figure out crime distributions by time, type, region, and more, to provide some insights for the purpose of crime governance and prevention.
+
+Our motivation for pursuing this project is to contribute to the development of effective crime prevention strategies in Chicago. We hope to gain a deeper understanding of patterns behind the criminal cases, and we believe effective analysis from organized data helps direct prevention efforts to the safety of Chicago.
+
+## Related Work
+In recent years, crime analysis has become an important field for researchers and policymakers alike. One of the challenges in crime analysis is the large volume of data that must be processed and analyzed. In this context, using R language to analyze crime data is a popular method, as they provide powerful tools for data manipulation and analysis. 
+
+The paper *Chicago Crime Analysis using R Programming* by Monish N @monish2019chicago focuses on the analysis of crime data in the city of Chicago using R. The author demonstrates the use of various visualization like heat map, and statistical techniques such as descriptive statistics, inferential statistics, and cluster analysis to explore crime patterns in the city. The findings show that crime rates in Chicago are highest in certain neighborhoods and that there are specific types of crimes that are more prevalent in these areas. The paper highlights the potential of R for crime analysis and prediction, particularly in identifying high-risk areas.
+
+*Predictive Policing in Crime analysis using R* by Rohith Mallula and Preetham Chowdary @mallula2018predictive focuses on the use of predictive modeling techniques to forecast crime trends. The authors apply machine learning algorithms like KNN to predict the type of crime that is likely to occur in a given location based on the types of crimes that have occurred in similar locations. The findings suggest that their model is able to accurately predict crime patterns, particularly in relation to certain types of crimes and geographical areas. The ideas behind the paper can be applied in our project.
+
+
+The paper *Opportunities and challenges of text mining in materials research* @kononova2021opportunities discusses the application of text mining in the field of materials research. One of the innovative approaches used in the paper is the use of visualization techniques to represent the results of text mining. Specifically, the authors employ topic modeling and word cloud analysis to extract and visualize the most common topics and terms in material research publications. The paper also highlights the importance of choosing appropriate variables (such as keywords and topic categories) for text mining in order to accurately capture relevant information from the large amount of available text data. This method will also inspire our project. Specifically, incorporating topic modeling and word cloud analysis into the Chicago Crime Data Analysis Project allowed the identification and visualization of the most common themes and keywords associated with specific types of crime.
+
+
+## Data 
+
+### About the Dataset
+The dataset reflects incidents of crime (with the exception of murders) that occurred in the City of Chicago from 2001 to present, minus the most recent seven days. Data is retrieved from the Chicago Police Department, who collects and also owns the data, and updates the dataset daily. The dataset was created in September 20, 2011, and last updated in April 29, 2023, until when the report is written.
+
+In this dataset, there are 7.78 million rows and 22 columns, each row represents a reported crime. Each crime has a unique identifier, date when the incident occurred. Other information in columns include description of location, indication of whether arrest was made, which community area the incident occurred, and crime classification outlined in the FBI's National Incident-Based Reporting System. As we can see, most of the content in the dataset is displayed in plain text, which brings about a big challenge in this project to deal with such data type and extract effective information from them.
+
+### Data Import
+We used the API provided in the Chicago Data Portal to import the data. Considering the large volume of data size and to make our analysis more up-to-date, we only imported data starting from January 1, 2020. This also gives us a closer look at the impact of COVID-19 on crime types.
+
+Until the last day updated, the imported dataset contains 732,743 observations of 22 columns. However, as we are connecting a dynamic source, the data size may come up to a limit of 1,000,000 one day with thousands of rows daily added to the data. To ensure our imported data starts from 2020, we take a step further to dynamically update the limit of data size. That is, if the imported data reaches the limit of 1,000,000, the procedure will automatically raise the limit by 500,000 for each time. This makes our design of data import more robust and steady. 
+
+### Data Exhibition
+The original data is in the JSON form, we convert it to a dataframe and stored it in CSV file named as "data", and the first few observations are displayed as below:
+
+![Head Data](figures/data_head.png)
+
+Source of the dataset: <https://data.cityofchicago.org/Public-Safety/Crimes-2001-to-Present/ijzp-q8t2>
+
+## Exploratory Data Analysis
+### Numerical Summaries
+Most of the columns are in characters with descriptions of location, police district number, crime classification, and etc. Numerical characters indicating latitude, longtitude of the location and year happened are important variables as well, but not that worthy of looking into their absolute values. As a result, for numerical analysis part, we mainly focus on two logistic variables, "arrest" indicating whether an arrest was made and "domestic" indicating whether the incident was domestic related as defined by the Illinois Domestic Violence Act. Their numerical summaries are shown below:
+
+!["arrest" summary](figures/summary1.png){width=200}
+!["domestic" sumamry](figures/summary2.png){width=200}
+Explicitly from the summary, the proportion of arrest under a certain crime is approximately 13%, and that of domestic-related rate is almost 20%. We are curious about the distribution of such arrest rate and domestic violence rate across different time periods and which area it happens, which might be included in our final report.
+
+### Data Exploration
+To further explore on how the data is distributed, we plotted several graphs here.
+![Daily Crimes Count](figures/Plot1.png){width=300}
+The bar chart shows the number of crimes reported each day from January 1, 2022 onwards. Daily average reported crimes is below 750, with some outliers reaches around 1800 within one day. We are curious about these outliers and want to dig it out in the following procudures. Number of crimes decreased dramatically during March and April in 2020, which might be corrlated with the pandemic at that time if we look into reality. 
+
+
+![Crimes by Criminal Type](figures/Plot2.png){width=400}
+This bar chart shows number of crimes by criminal type, and we selected out types with reported cases greater than 1,000 starting from 2020 in here. Top crime types include theft, battery, criminal damage, and assault.
+
+
+![Crimes by Location Description](figures/Plot3.png){width=300}
+This bar chart shows number of crimes by criminal location, and we selected out locations with reported cases greater than 10,000 in here. Top ranking places include street, apartment, and residence. We are surprised to see the fourth ranking goes to sidewalk, which should be raise awareness for further prevention.
+
+
+![Crimes by Season and Year](figures/Plot4.png){width=400}
+We can see number of crimes is generally larger in fall and summer, and shrinks in winter and spring, which indicates seasonality within. Annually speaking, the reported cases in 2022 are comparably much more than that in 2021 and 2020.
+
+Based on the visuals above, the data set suggests that crime is a significant problem in Chicago, with a complex set of factors contributing to the number and types of crimes reported. There appears to be a clear seasonality to the number of crimes reported. There is also some variability in the number of crimes reported from year to year. We are curious about the factors behind these findings and contruct a more comprehensive and detailed analysis on them.
+
+## Challenges
+Major challenges and issues so far:
+1.   7.78M rows of dataset, with limited amount of retrieve using API;
+2.    Plain text data type requires more technique in text mining and extracting effective information;
+3.    Unable to store and save large dataset and Git it considering limited storage by Github and RStudio.
+
+
+{{< pagebreak >}}
+
+## Next Steps
+![Timeline](figures/Timeline.png){width=400}
+
+## Contribution
+Yu Wang is responsible for: data import and analysis coding, and corresponding parts in writing report and general revisions. 60%
+Yijia Hu is responsible for: abstract, introduction and literature review part. 40%

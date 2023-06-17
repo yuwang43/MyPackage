@@ -1,0 +1,23 @@
+\name{RSS function}
+\alias{RSS function}
+\title{
+Calculate Residual Sum of Squares (RSS)
+}
+\usage{
+RSS(y,y_pred)
+}
+\description{
+Calculate Residual Sum of Squares (RSS) for a given vector and its corresponding fitted values.
+\arguments{
+  \item{y}{Numeric vector}
+  \item(y_pred){Numeric vector}
+}
+
+\value{
+Residual sum of squares
+}
+\examples{
+y <- c(1, 2, 3, 4, 5)
+y_pred <- c(1.5, 2.5, 3.5, 4.5, 5.5)
+RSS (y, y_pred)
+}

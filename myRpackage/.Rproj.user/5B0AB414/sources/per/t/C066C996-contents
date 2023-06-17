@@ -1,0 +1,117 @@
+library(httr)
+library(jsonlite)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(tidyverse)
+library(DiagrammeR)
+#####################
+## Import the data ##
+#####################
+#specify a fixed date from 20200101, with a upper limit of 100,0000 rows
+vol = "1000000"
+while (as.numeric(vol) > 0) {
+  url <- paste0("https://data.cityofchicago.org/resource/crimes.json?$where=date%20>=%20%222020-01-01%22&$limit=", vol)
+  response <- jsonlite::fromJSON(url)
+  df <- as.data.frame(response)
+  if (nrow(df) == as.numeric(vol)) {
+    vol = as.character(as.numeric(vol) + 500000)
+    next
+  } else {
+    break
+  }
+}
+
+# Convert the JSON to a data frame
+df <- as.data.frame(response)
+
+write.csv(df, file = "data")
+head(df)
+
+
+#####################
+##      EDA        ##
+#####################
+summary(df)
+summary(df$date)
+summary(df$arrest)
+summary(df$domestic)
+table(df$primary_type)
+
+######plot 1 ######
+# Group the data by date and count the number of crimes for each date
+df_grouped <- df %>%
+  group_by(date = as.Date(date)) %>%
+  summarize(num_crimes = n()) %>%
+#df_grouped$date <- as.Date(df_grouped$date)
+# Create a plot of the number of reported crimes by date
+  ggplot(aes(x = date, y = num_crimes)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Number of Reported Crimes by Date", x = "Date", y = "Number of Crimes")
+
+
+######plot 2 ######
+# Count the number of crimes by crime type and sort by decreasing order and filter 1000 more cases
+df_crime_counts <- as.data.frame(table(df$primary_type))
+df_crime_counts <- df_crime_counts %>%
+  filter(Freq > 1000) %>%
+  arrange(desc(Freq)) %>%
+# Create a bar chart of the filtered crime types by frequency
+  ggplot( aes(x = reorder(Var1, Freq), y = Freq, fill = Freq)) +
+  geom_bar(stat = "identity") +
+  scale_fill_gradient(low = "yellow", high = "red") +
+  labs(title = "Crime Types with More Than 1000 Occurrences", x = "Crime Type", y = "Number of Crimes") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+######plot 3 ######
+#Number of Reported Crimes by Location Description
+df_location_counts <- as.data.frame(table(df$location_description))
+df_location_counts <- df_location_counts %>%
+  filter(Freq > 10000) %>%
+  arrange(desc(Freq)) %>%
+  ggplot(aes(x = reorder(Var1, Freq), y = Freq, fill = Freq)) +
+  geom_bar(stat = "identity") +
+  scale_fill_gradient(low = "pink", high = "purple") +
+  labs(title = "Number of Reported Crimes by Location Description", x = "Location Type", y = "Number of Crimes") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+######plot 4 ######
+#Number of crimes by season
+# Create a new column for the season based on the date of the crime
+df_grouped_2 <- df %>%
+  mutate(season = case_when(month(date) %in% 3:5 ~ "Spring",
+                            month(date) %in% 6:8 ~ "Summer",
+                            month(date) %in% 9:11 ~ "Fall",
+                            TRUE ~ "Winter"))
+
+# Group the data by season and count the number of crimes for each season
+df_season_counts <- df_grouped_2 %>%
+  group_by(year,season) %>%
+  summarize(num_crimes = n()) %>%
+# Create a line chart with points of the number of crimes by season and by year
+  ggplot(aes(x = year, y = num_crimes, group = season)) +
+  geom_line(aes(color = season), linewidth = 1) +
+  geom_point(aes(color = season), size = 2, shape = 21, fill = "white") +
+  scale_color_discrete(name = "Season") +
+  labs(title = "Number of Crimes by Season and Year",
+       x = "Year",
+       y = "Number of Crimes") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+
+#timeline
+mermaid("
+gantt
+       dateFormat  YYYY-MM-DD
+       title Project Timeline
+
+       section Project Outline
+       Proposal            :done,    des1, 2023-04-10,
+       Progress report     :done,  des2, 2023-04-30,
+       Exploratory data analysis :done,  des3, 2023-05-05,
+       Statistical analysis: done,des4, 2023-05-07,
+       Report compiling    :done,  des5, 2023-05-10
+       Presenation        : done,  des6, after des5, 1d
+
+")

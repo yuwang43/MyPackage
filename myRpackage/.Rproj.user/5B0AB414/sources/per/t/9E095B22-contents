@@ -1,0 +1,25 @@
+# Title of Group Project
+
+- **Team ID:** 13
+- **Team Name:** PARM TEAM
+- **Team Members:**
+  - Yu Wang (yw78)
+  - Yijia Hu (yijiahu3)
+
+## Overview 
+
+This project aims to analyze dynamic criminal data in the city of Chicago with explanatory data analysis and model prediction. Our task was to provide a comprehensive analysis of the crimes that took place in Chicago starting from January 1, 2020.
+
+## Contribution 
+
+Place each stage of the contribution here.
+
+### Proposal
+Confirmed the topic, framework of the whole project, major steps and timeline.
+### Progress
+Finished data importing, manipulation and 4 plots for exploratory data analysis
+### Final Report
+Continued on EDA, added 2 plots, used logistic regression for prediction, built a shiny app for user interation, and wrote up the report.
+
+
+
